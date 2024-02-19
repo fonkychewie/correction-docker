@@ -1,0 +1,25 @@
+services:
+  app: # On appelle notre service "app"
+    build: . # Chemin vers le Dockerfile de notre image
+    depends_on:
+      - mysql
+    ports:
+      - "8080:80" # On rend le serveur Apache (port 80) de notre conteneur accessible depuis le port 8080 de notre hôte local (host:conteneur)
+    volumes:
+      - .:/var/www # On créé un volume pour lier les fichiers de notre application à notre conteneur
+  mysql:
+    image: mysql:8.3
+    ports:
+      - "33060:3306"
+    environment:
+      - MYSQL_DATABASE=${DB_DATABASE} # Permet de récupérer le nom de BDD du .env
+      - MYSQL_ALLOW_EMPTY_PASSWORD=yes # Autorise à ne pas avoir de mot de passe
+      - MYSQL_ROOT_PASSWORD=${DB_PASSWORD} # Permet de récupérer le password du .env (mettez un password sur la variable DB_PASSWORD de votre .env sinon votre conteneur ne fonctionnera pas)
+  phpmyadmin:
+    image: phpmyadmin:5.2
+    depends_on:
+      - mysql
+    ports:
+      - "8081:80"
+    environment:
+      PMA_HOST: mysql
